@@ -30,18 +30,21 @@ class TennisGameScorer
       points[0] += 1 if point == 0
       points[1] += 1 if point == 1
 
-      if deuce?
-
-      end
-      # @points = [0, 0] if deuce?
-
       if points[0] == 4 || points[1] == 4 && two_points_difference? &&!deuce?
         games[0] += 1 if points[0] == 4
         games[1] += 1 if points[1] == 4
         @points = [0, 0]
       end
 
-      if games[0] == 6 || games[1] == 6
+      if tie_breaker?
+        if two_points_difference?
+          sets[0] += 1 if games[0] > games[1]
+          sets[1] += 1 if games[1] > games[0]
+
+          @games = [0, 0]
+          @points = [0, 0]
+        end
+      elsif completed_games?
         sets[0] += 1 if games[0] == 6
         sets[1] += 1 if games[1] == 6
 
@@ -61,6 +64,14 @@ class TennisGameScorer
 
   def advantage?
     deuce? && points[0] != points[1]
+  end
+
+  def completed_games?
+    games[0] == 6 || games[1] == 6
+  end
+
+  def tie_breaker?
+    games[0] >= 5 && games[1] >= 5
   end
 
   def current_game_status
